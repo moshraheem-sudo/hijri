@@ -1,100 +1,240 @@
-# Hijri — Shia Islamic Hijri Calendar Data
+# Hijri — Shia Hijri Calendar & Prayer Times Data
 
-A specialized Hijri calendar data repository for Shia Islamic applications, providing regularly updated Hijri dates based on authoritative religious sources.
+A structured Hijri calendar data repository designed for Shia Islamic applications, with a focus on providing Hijri dates and religious timing information based on recognized Shia sources.
 
-## Purpose
+The project can be used by mobile applications, websites, and software systems that require Hijri calendar information and Islamic prayer-time data in a structured JSON format.
 
-This project provides Hijri calendar data for Islamic applications that require a Shia-oriented religious calendar rather than relying exclusively on astronomical or civil Hijri calculations.
+---
 
-The project aims to provide updated Hijri dates according to recognized Shia religious sources, including:
+## Primary Data Source — Haqybat Al-Mu'min API
 
-* Office of His Eminence Sayyid Ali al-Sistani
-* Al-Kafeel / Al-Abbas Holy Shrine calendar
-* Al-Mu'min application and its published Hijri calendar data
+The primary technical data source used by this project is the official **Haqybat Al-Mu'min API**, provided through the Al-Kafeel platform.
 
-## Data Sources
+The API provides Islamic prayer times and the corresponding Hijri date according to the location and timezone supplied to the API.
 
-The calendar data is intended to be cross-checked and updated according to the following sources:
+### Official API
 
-### 1. Office of Sayyid Ali al-Sistani
+**Prayer Times JSON API:**
 
-The Hijri date published by the official office of His Eminence Sayyid Ali al-Sistani is considered a primary religious reference for determining the beginning of Hijri months according to Shia jurisprudence.
+https://hq.alkafeel.net/Api/init/init.php?v=jsonPrayerTimes
 
-Source:
-https://www.sistani.org/
+### API Parameters
 
-### 2. Al-Kafeel / Al-Abbas Holy Shrine
+The API supports location-based calculations using:
 
-The Al-Kafeel platform and the Al-Abbas Holy Shrine provide Islamic calendar information, religious occasions, and Hijri dates used by many Shia users.
+* `timezone` — The timezone of the requested location.
+* `long` — Longitude of the requested city.
+* `lati` — Latitude of the requested city.
+* `v=jsonPrayerTimes` — Requests the prayer-times response in JSON format.
 
-Source:
-https://alkafeel.net/
+### Example
 
-### 3. Al-Mu'min
+```text
+https://hq.alkafeel.net/Api/init/init.php?timezone=+3&long=44&lati=32&v=jsonPrayerTimes
+```
 
-The Al-Mu'min application is used as an additional reference for Islamic dates, religious occasions, and Shia calendar information.
-
-## Important Note
-
-Hijri dates related to the beginning of lunar months may differ between different calendar systems because the beginning of a month can depend on the religious determination of the crescent moon.
-
-Therefore, this repository does not treat mathematical Hijri conversion alone as an authoritative determination of religious month beginnings.
-
-The data is intended primarily for religious applications that require Shia Hijri calendar information.
-
-## Data Format
-
-The repository currently provides the Hijri calendar in JSON format:
-
-`hijri.json`
-
-The data can be consumed directly by mobile applications, websites, APIs, and other software projects.
-
-Example:
+### Example JSON Response
 
 ```json
 {
-  "gregorian": "2026-09-06",
-  "hijri": "1448-03-14",
-  "month": "Rabi al-Awwal",
-  "source": "Sistani",
-  "verified": true
+  "fajir": "5:18",
+  "sunrise": "6:47",
+  "doher": "11:53",
+  "sunset": "4:59",
+  "maghrib": "5:15",
+  "date": "27 صفر 1438 هـ",
+  "powerdby": "haqybat almomen"
 }
 ```
 
-## Update Policy
+The `date` field provides the Hijri date returned by the Haqybat Al-Mu'min service.
 
-Hijri dates should be reviewed and updated regularly, especially around:
+---
 
-* Beginning of Ramadan
-* Eid al-Fitr
-* Beginning of Dhu al-Hijjah
-* Eid al-Adha
-* Muharram
-* Safar
-* Arbaeen
-* Other important religious occasions
+## Hijri Date Updates
 
-When sources provide different dates, the repository should preserve the source information instead of silently replacing one date with another.
+This repository is intended to maintain updated Hijri-date information for Shia Islamic applications.
+
+The data may be cross-checked against recognized Shia religious references, particularly:
+
+1. **Haqybat Al-Mu'min API** — primary technical API source.
+2. **Office of His Eminence Sayyid Ali al-Sistani** — religious reference for lunar-month determinations and announcements.
+3. **Al-Kafeel / Al-Abbas Holy Shrine** — Islamic calendar and religious-event reference.
+
+Because the beginning of a Hijri lunar month can depend on crescent visibility and religious determination, calculated Hijri dates should not automatically be treated as equivalent to an officially announced religious date.
+
+---
+
+## Religious Reference
+
+For religiously significant dates, especially the beginning of lunar months, users should verify the date through the official announcements and rulings of the relevant religious authority.
+
+The official website of the Office of Sayyid Ali al-Sistani is:
+
+https://www.sistani.org/
+
+---
+
+## Haqybat Al-Mu'min Services
+
+Haqybat Al-Mu'min provides several services through its API platform.
+
+### Virtual Haqybat Al-Mu'min Box
+
+https://hq.alkafeel.net/Api/index.php?model=standerdBlock
+
+### Prayer Times JSON
+
+https://hq.alkafeel.net/Api/index.php?model=jsonPrayerTimes
+
+### Prayer Times API Endpoint
+
+```text
+https://hq.alkafeel.net/Api/init/init.php?v=jsonPrayerTimes&timezone=TIMEZONE&long=LONGITUDE&lati=LATITUDE
+```
+
+### PHP Example
+
+```php
+<?php
+
+// Get Prayer Times
+$timesJson = file_get_contents(
+    "https://hq.alkafeel.net/Api/init/init.php?timezone=+3&long=44&lati=32&v=jsonPrayerTimes"
+);
+
+// Parse JSON
+$Times = json_decode($timesJson);
+
+// Fajr
+echo $Times->fajir;
+
+// Hijri Date
+echo $Times->date;
+
+?>
+```
+
+---
+
+## Data Fields
+
+The prayer-times API may return the following fields:
+
+| Field      | Description              |
+| ---------- | ------------------------ |
+| `fajir`    | Fajr prayer time         |
+| `sunrise`  | Sunrise time             |
+| `doher`    | Dhuhr prayer time        |
+| `sunset`   | Sunset time              |
+| `maghrib`  | Maghrib prayer time      |
+| `date`     | Hijri date               |
+| `powerdby` | Data provider identifier |
+
+---
+
+## Location-Based Calculation
+
+Prayer times can be requested for different locations by changing the timezone, longitude, and latitude parameters.
+
+```text
+timezone = Country / location timezone
+long     = Longitude
+lati     = Latitude
+```
+
+Example:
+
+```text
+timezone=+3
+long=44
+lati=32
+```
+
+The returned prayer times therefore depend on the geographical coordinates and timezone supplied to the API.
+
+---
+
+## Data Verification Strategy
+
+To improve reliability, applications using this repository should distinguish between:
+
+### Calculated / API Date
+
+The Hijri date returned automatically by the Haqybat Al-Mu'min API.
+
+### Religiously Confirmed Date
+
+A Hijri date confirmed through an official religious announcement or authoritative Shia religious source.
+
+When these dates differ, the repository should preserve the source information rather than silently changing one date to another.
+
+---
 
 ## Intended Use
 
-This project can be used by:
+This repository can be used for:
 
-* Islamic mobile applications
-* Prayer and worship applications
+* Shia Islamic mobile applications
 * Hijri calendar applications
-* Shia religious applications
-* Religious notification systems
-* Islamic event calendars
-* Developers who need structured Hijri calendar data
+* Prayer-time applications
+* Islamic religious-event calendars
+* Ramadan and fasting applications
+* Muharram and Safar calendars
+* Arbaeen and religious-occasion notifications
+* Islamic widgets
+* Websites and web applications
+* JSON-based calendar services
+* Mobile application backends
 
-## Disclaimer
+---
 
-This is an independent open-source software project and is not affiliated with or officially endorsed by the Office of Sayyid Ali al-Sistani, Al-Kafeel, Al-Abbas Holy Shrine, or the Al-Mu'min application.
+## Important Disclaimer
 
-Official religious rulings and announcements should always be verified through the respective official sources.
+This repository is an independent open-source software project.
 
-## License
+It is **not officially affiliated with, operated by, or endorsed by** the Office of Sayyid Ali al-Sistani, Al-Kafeel, the Al-Abbas Holy Shrine, or the Haqybat Al-Mu'min application.
 
-This repository is intended to provide structured calendar data for software development and educational purposes.
+The Haqybat Al-Mu'min API is referenced as an external data source. Religious dates should be verified against the official announcements of the relevant religious authority, especially when determining the beginning of lunar months.
+
+---
+
+## Official / Reference Links
+
+### Office of Sayyid Ali al-Sistani
+
+https://www.sistani.org/
+
+### Al-Kafeel
+
+https://alkafeel.net/
+
+### Haqybat Al-Mu'min API
+
+https://hq.alkafeel.net/Api/
+
+### Technical Support
+
+https://alkafeel.net/contact/
+
+### Haqybat Al-Mu'min — Facebook
+
+https://www.facebook.com/haqibatalmomen
+
+### Haqybat Al-Mu'min — Google Play
+
+https://play.google.com/store/apps/details?id=net.alkafeel.mcb
+
+### Haqybat Al-Mu'min — App Store
+
+https://itunes.apple.com/us/app/hqybt-almwmn/id935681991
+
+---
+
+## License & Attribution
+
+Applications using this repository should retain attribution to the original data source where applicable.
+
+The repository's purpose is to organize and provide structured data for software development while preserving information about the original source of the data.
+
+**Primary API Source: Haqybat Al-Mu'min — Al-Kafeel Platform**
