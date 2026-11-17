@@ -1,78 +1,31 @@
-# Hijri — Shia Hijri Calendar & Prayer Times Data
+# الهجري (Hijri) — بيانات التقويم الهجري ومواقيت الصلاة وفق الرؤية الشرعية
 
-A structured Hijri calendar data repository designed for Shia Islamic applications, with a focus on providing Hijri dates and religious timing information based on recognized Shia sources.
+مستودع بيانات منظم للتقويم الهجري مخصص للتطبيقات والأنظمة البرمجية الإسلامية الشيعية، مع التركيز على توفير التاريخ الهجري الموثق ومواقيت الصلاة استناداً إلى المصادر الشرعية والتقنية المعتمدة.
 
-The project can be used by mobile applications, websites, and software systems that require Hijri calendar information and Islamic prayer-time data in a structured JSON format.
+يمكن استخدام هذا المشروع من قِبل تطبيقات الهواتف الذكية، والمواقع الإلكترونية، والأنظمة البرمجية التي تحتاج لبيانات تقويم هجري ومواقيت صلاة بصيغة JSON مهيكلة ومحدثة باستمرار.
 
 ---
 
-## Primary Data Source — Haqybat Al-Mu'min API
+## الرابط المباشر للتطبيقات (Direct API / Raw JSON)
 
-The primary technical data source used by this project is the official **Haqybat Al-Mu'min API**, provided through the Al-Kafeel platform.
-
-The API provides Islamic prayer times and the corresponding Hijri date according to the location and timezone supplied to the API.
-
-### Official API
-
-**Prayer Times JSON API:**
-
-https://hq.alkafeel.net/Api/init/init.php?v=jsonPrayerTimes
-
-### API Parameters
-
-The API supports location-based calculations using:
-
-* `timezone` — The timezone of the requested location.
-* `long` — Longitude of the requested city.
-* `lati` — Latitude of the requested city.
-* `v=jsonPrayerTimes` — Requests the prayer-times response in JSON format.
-
-### Example
+يمكن لأي تطبيق أو موقع جلب أحدث بيانات للتاريخ الهجري مباشرة عبر الرابط التالي:
 
 ```text
-https://hq.alkafeel.net/Api/init/init.php?timezone=+3&long=44&lati=32&v=jsonPrayerTimes
+https://raw.githubusercontent.com/moshraheem-sudo/hijri/main/hijri.json
 ```
-
-### Example JSON Response
-
-```json
-{
-  "fajir": "5:18",
-  "sunrise": "6:47",
-  "doher": "11:53",
-  "sunset": "4:59",
-  "maghrib": "5:15",
-  "date": "27 صفر 1438 هـ",
-  "powerdby": "haqybat almomen"
-}
-```
-
-The `date` field provides the Hijri date returned by the Haqybat Al-Mu'min service.
 
 ---
 
-## Hijri Date Updates
+## التحديث التلقائي عبر موقع مكتب السيد السيستاني (`hijri.json`)
 
-This repository is intended to maintain updated Hijri-date information for Shia Islamic applications.
+يحتوي المستودع على نظام أتمتة سحابي يعمل على مدار الساعة عبر **GitHub Actions** من خلال مسار العمل (`.github/workflows/update_hijri.yml`)، حيث يقوم بفحص الموقع الرسمي لمكتب سماحة المرجع الديني الأعلى السيد علي الحسيني السيستاني ([sistani.org](https://www.sistani.org/)) وتحديث البيانات وفق التفاصيل الآتية:
 
-The data may be cross-checked against recognized Shia religious references, particularly:
+* **فترة تحري الهلال وبدايات الشهور:** يعمل الفحص تلقائياً **كل ساعتين طوال اليوم** في الأيام (`28، 29، 30، 31، 1، 2، 3`) لضمان التقاط بيانات ثبوت رؤية الهلال ودخول الشهر القمري الجديد فور نشرها على الموقع الرسمي.
+* **الفحص اليومي المنتظم:** يعمل تلقائياً يومياً لبقية أيام الشهر.
+* **نظام التحديث الذكي (Smart Commit):** لا يقوم بعمل أي التزام (Commit) إلا إذا طرأ تغيير فعلي على التاريخ، حفاظاً على نظافة المستودع من التكرار.
+* **التشغيل اليدوي:** يمكن تشغيل سير العمل يدوياً في أي لحظة بضغطة زر عبر تبويب **Actions** في غيتهاب.
 
-1. **Haqybat Al-Mu'min API** — primary technical API source.
-2. **Office of His Eminence Sayyid Ali al-Sistani** — religious reference for lunar-month determinations and announcements.
-3. **Al-Kafeel / Al-Abbas Holy Shrine** — Islamic calendar and religious-event reference.
-
-Because the beginning of a Hijri lunar month can depend on crescent visibility and religious determination, calculated Hijri dates should not automatically be treated as equivalent to an officially announced religious date.
-
----
-
-## Automated Sistani.org Synchronization (hijri.json)
-
-The repository includes an automated GitHub Actions workflow (`.github/workflows/update_hijri.yml`) that checks the official website of the Office of His Eminence Sayyid Ali al-Sistani ([sistani.org](https://www.sistani.org/)):
-
-* **High-Frequency Window**: Runs every 2 hours on days 28, 29, 30, 31, and 1, 2 of each month to capture lunar crescent observations and month transition announcements in real time.
-* **Daily Sync**: Runs daily during standard days.
-* **Format**: Stores the active Hijri date, anchor date, day name, Najaf time, and verification status in `hijri.json`.
-* **Manual Dispatch**: Can be triggered manually at any time via the GitHub Actions tab.
+### هيكلية بيانات ملف `hijri.json`
 
 ```json
 {
@@ -90,178 +43,145 @@ The repository includes an automated GitHub Actions workflow (`.github/workflows
 }
 ```
 
+### وصف حقول البيانات في `hijri.json`:
+
+| الحقل | النوع | الوصف |
+| :--- | :--- | :--- |
+| `hijri_day` | رقم (Integer) | رقم اليوم الهجري الحالي (مثل `6`). |
+| `hijri_month` | رقم (Integer) | رقم الشهر الهجري (من 1 إلى 12). |
+| `hijri_year` | رقم (Integer) | السنة الهجرية (مثل `1448`). |
+| `hijri_month_name` | نص (String) | الاسم العربي للشهر الهجري (مثل `جمادى الآخرة`). |
+| `day_name` | نص (String) | اسم يوم الأسبوع باللغة العربية (مثل `الثلاثاء`). |
+| `gregorian_date` | نص (String) | التاريخ الميلادي المقابل بصيغة `YYYY-MM-DD`. |
+| `gregorian_anchor_date`| نص (String) | تاريخ أول يوم (1) من هذا الشهر الهجري ميلادياً. |
+| `time_najaf` | نص (String) | التوقيت المحلي لمدينة النجف الأشرف وقت التحديث. |
+| `status` | نص (String) | حالة التوثيق الشرعي (`verified`). |
+| `source` | نص (String) | مصدر البيانات المعتمد (`https://www.sistani.org/`). |
+| `last_updated` | نص (String) | الطابع الزمني لآخر عملية تحقق وتحديث. |
+
 ---
 
-## Religious Reference
+## مصدر بيانات مواقيت الصلاة — واجهة تطبيق حقيبة المؤمن
 
-For religiously significant dates, especially the beginning of lunar months, users should verify the date through the official announcements and rulings of the relevant religious authority.
+المصدر التقني الأساسي لمواقيت الصلاة في هذا المشروع هو الواجهة البرمجية الرسمية لتطبيق **حقيبة المؤمن** المقدمة عبر منصة شبكة الكفيل العالمية (العتبة العباسية المقدسة).
 
-The official website of the Office of Sayyid Ali al-Sistani is:
+توفر الواجهة مواقيت الصلاة والتاريخ الهجري المحسوب بناءً على الموقع الجغرافي والمنطقة الزمنية.
 
-https://www.sistani.org/
-
----
-
-## Haqybat Al-Mu'min Services
-
-Haqybat Al-Mu'min provides several services through its API platform.
-
-### Virtual Haqybat Al-Mu'min Box
-
-https://hq.alkafeel.net/Api/index.php?model=standerdBlock
-
-### Prayer Times JSON
-
-https://hq.alkafeel.net/Api/index.php?model=jsonPrayerTimes
-
-### Prayer Times API Endpoint
+### الرابط الرسمي للواجهة البرمجية (API)
 
 ```text
-https://hq.alkafeel.net/Api/init/init.php?v=jsonPrayerTimes&timezone=TIMEZONE&long=LONGITUDE&lati=LATITUDE
+https://hq.alkafeel.net/Api/init/init.php?v=jsonPrayerTimes
 ```
 
-### PHP Example
+### معاملات الاستعلام (Parameters):
+
+* `timezone` — فارق المنطقة الزمنية للمدينة المطلوبة (مثال: `+3`).
+* `long` — خط الطول للمدينة (Longitude).
+* `lati` — خط العرض للمدينة (Latitude).
+* `v=jsonPrayerTimes` — لطلب الاستجابة بصيغة JSON.
+
+### مثال على الرابط:
+
+```text
+https://hq.alkafeel.net/Api/init/init.php?timezone=+3&long=44&lati=32&v=jsonPrayerTimes
+```
+
+### نموذج استجابة JSON:
+
+```json
+{
+  "fajir": "5:18",
+  "sunrise": "6:47",
+  "doher": "11:53",
+  "sunset": "4:59",
+  "maghrib": "5:15",
+  "date": "27 صفر 1438 هـ",
+  "powerdby": "haqybat almomen"
+}
+```
+
+### جدول حقول مواقيت الصلاة:
+
+| الحقل | الوصف |
+| :--- | :--- |
+| `fajir` | وقت أذان الفجر |
+| `sunrise` | وقت شروق الشمس |
+| `doher` | وقت أذان الظهر |
+| `sunset` | وقت غروب الشمس |
+| `maghrib` | وقت أذان المغرب |
+| `date` | التاريخ الهجري |
+| `powerdby` | الجهة المزودة للبيانات |
+
+### مثال استخدام بلغة PHP:
 
 ```php
 <?php
-
-// Get Prayer Times
+// جلب مواقيت الصلاة
 $timesJson = file_get_contents(
     "https://hq.alkafeel.net/Api/init/init.php?timezone=+3&long=44&lati=32&v=jsonPrayerTimes"
 );
 
-// Parse JSON
+// فك تشفير JSON
 $Times = json_decode($timesJson);
 
-// Fajr
+// الفجر
 echo $Times->fajir;
 
-// Hijri Date
+// التاريخ الهجري
 echo $Times->date;
-
 ?>
 ```
 
 ---
 
-## Data Fields
+## استراتيجية التحقق من التاريخ الهجري
 
-The prayer-times API may return the following fields:
+لضمان دقة التطبيقات وموثوقيتها، يجب التمييز بين:
 
-| Field      | Description              |
-| ---------- | ------------------------ |
-| `fajir`    | Fajr prayer time         |
-| `sunrise`  | Sunrise time             |
-| `doher`    | Dhuhr prayer time        |
-| `sunset`   | Sunset time              |
-| `maghrib`  | Maghrib prayer time      |
-| `date`     | Hijri date               |
-| `powerdby` | Data provider identifier |
+1. **التاريخ المحسوب فلكياً / عبر API:** التاريخ الهجري الذي تعيده الخوارزميات الحسابية تلقائياً.
+2. **التاريخ المثبت شرعياً:** التاريخ الهجري المؤكد بموجب الإعلان والبيان الشرعي الرسمي للجهة الدينية المعتمدة (مكتب سماحة السيد السيستاني).
+
+نظراً لأن بداية الشهر الهجري القمري تعتمد على ثبوت رؤية الهلال شرعاً، فإن ملف `hijri.json` في هذا المستودع يمثل **التاريخ المثبت شرعياً** من الموقع الرسمي لمكتب سماحة السيد السيستاني.
 
 ---
 
-## Location-Based Calculation
+## مجالات الاستخدام المقترحة
 
-Prayer times can be requested for different locations by changing the timezone, longitude, and latitude parameters.
+يمكن استخدام بيانات هذا المستودع في:
 
-```text
-timezone = Country / location timezone
-long     = Longitude
-lati     = Latitude
-```
-
-Example:
-
-```text
-timezone=+3
-long=44
-lati=32
-```
-
-The returned prayer times therefore depend on the geographical coordinates and timezone supplied to the API.
+* تطبيقات الهواتف الذكية الإسلامية الشيعية (Flutter, React Native, Kotlin, Swift).
+* تطبيقات التقويم الهجري والميلادي.
+* تطبيقات مواقيت الصلاة والأذان.
+* تقويم المناسبات الدينية والأحداث الإسلامية.
+* تطبيقات شهر رمضان المبارك وأوقات الإمساك والإفطار.
+* جداول ومواسم شهري محرم الحرام وصفر وأربعينية الإمام الحسين (ع).
+* عناصر واجهة المستخدم المصغرة (Widgets) للهواتف والحواسيب.
+* المواقع والمنصات وتطبيقات الويب.
+* خدمات التقويم الخلفية (Backends) وواجهات REST APIs.
 
 ---
 
-## Data Verification Strategy
+## إخلاء مسؤولية
 
-To improve reliability, applications using this repository should distinguish between:
+هذا المستودع هو مشروع برمجي مفتوح المصدر ومستقل تماماً.
 
-### Calculated / API Date
+المشروع **ليس جهة رسمية تابعة أو مدارة أو معتمدة رسمياً** من قِبل مكتب سماحة السيد علي الحسيني السيستاني، أو شبكة الكفيل، أو العتبة العباسية المقدسة، أو تطبيق حقيبة المؤمن.
 
-The Hijri date returned automatically by the Haqybat Al-Mu'min API.
-
-### Religiously Confirmed Date
-
-A Hijri date confirmed through an official religious announcement or authoritative Shia religious source.
-
-When these dates differ, the repository should preserve the source information rather than silently changing one date to another.
+يتم الاعتماد على الواجهات والمواقع المذكورة كمصادر بيانات خارجية لتسهيل التطوير البرمجي مع حفظ الحقوق لجهات الإصدار الأصلية.
 
 ---
 
-## Intended Use
+## الروابط المرجعية والرسمية
 
-This repository can be used for:
-
-* Shia Islamic mobile applications
-* Hijri calendar applications
-* Prayer-time applications
-* Islamic religious-event calendars
-* Ramadan and fasting applications
-* Muharram and Safar calendars
-* Arbaeen and religious-occasion notifications
-* Islamic widgets
-* Websites and web applications
-* JSON-based calendar services
-* Mobile application backends
-
----
-
-## Important Disclaimer
-
-This repository is an independent open-source software project.
-
-It is **not officially affiliated with, operated by, or endorsed by** the Office of Sayyid Ali al-Sistani, Al-Kafeel, the Al-Abbas Holy Shrine, or the Haqybat Al-Mu'min application.
-
-The Haqybat Al-Mu'min API is referenced as an external data source. Religious dates should be verified against the official announcements of the relevant religious authority, especially when determining the beginning of lunar months.
-
----
-
-## Official / Reference Links
-
-### Office of Sayyid Ali al-Sistani
-
-https://www.sistani.org/
-
-### Al-Kafeel
-
-https://alkafeel.net/
-
-### Haqybat Al-Mu'min API
-
-https://hq.alkafeel.net/Api/
-
-### Technical Support
-
-https://alkafeel.net/contact/
-
-### Haqybat Al-Mu'min — Facebook
-
-https://www.facebook.com/haqibatalmomen
-
-### Haqybat Al-Mu'min — Google Play
-
-https://play.google.com/store/apps/details?id=net.alkafeel.mcb
-
-### Haqybat Al-Mu'min — App Store
-
-https://itunes.apple.com/us/app/hqybt-almwmn/id935681991
-
----
-
-## License & Attribution
-
-Applications using this repository should retain attribution to the original data source where applicable.
-
-The repository's purpose is to organize and provide structured data for software development while preserving information about the original source of the data.
-
-**Primary API Source: Haqybat Al-Mu'min — Al-Kafeel Platform**
+* **الموقع الرسمي لمكتب سماحة السيد علي الحسيني السيستاني:**  
+  [https://www.sistani.org/](https://www.sistani.org/)
+* **شبكة الكفيل العالمية:**  
+  [https://alkafeel.net/](https://alkafeel.net/)
+* **واجهة حقيبة المؤمن البرمجية:**  
+  [https://hq.alkafeel.net/Api/](https://hq.alkafeel.net/Api/)
+* **الدعم الفني لشبكة الكفيل:**  
+  [https://alkafeel.net/contact/](https://alkafeel.net/contact/)
+* **تطبيق حقيبة المؤمن — Google Play:**  
+  [Google Play Store](https://play.google.com/store/apps/details?id=net.alkafeel.mcb)
+* **تطبيق حقيبة المؤمن — App Store:**  
+  [Apple App Store](https://itunes.apple.com/us/app/hqybt-almwmn/id935681991)
