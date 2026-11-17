@@ -1,7 +1,13 @@
 {
-  "hijri_day": 1,
-  "hijri_month": 5,
+  "hijri_day": 6,
+  "hijri_month": 6,
   "hijri_year": 1448,
+  "hijri_month_name": "جمادى الآخرة",
+  "day_name": "الثلاثاء",
+  "gregorian_date": "2026-11-17",
   "gregorian_anchor_date": "2026-11-12",
-  "status": "verified"
+  "time_najaf": "09:31:24",
+  "status": "verified",
+  "source": "https://www.sistani.org/",
+  "last_updated": "2026-11-17T09:31:18+03:00"
 }

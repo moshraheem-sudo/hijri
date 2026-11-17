@@ -65,6 +65,33 @@ Because the beginning of a Hijri lunar month can depend on crescent visibility a
 
 ---
 
+## Automated Sistani.org Synchronization (hijri.json)
+
+The repository includes an automated GitHub Actions workflow (`.github/workflows/update_hijri.yml`) that checks the official website of the Office of His Eminence Sayyid Ali al-Sistani ([sistani.org](https://www.sistani.org/)):
+
+* **High-Frequency Window**: Runs every 2 hours on days 28, 29, 30, 31, and 1, 2 of each month to capture lunar crescent observations and month transition announcements in real time.
+* **Daily Sync**: Runs daily during standard days.
+* **Format**: Stores the active Hijri date, anchor date, day name, Najaf time, and verification status in `hijri.json`.
+* **Manual Dispatch**: Can be triggered manually at any time via the GitHub Actions tab.
+
+```json
+{
+  "hijri_day": 6,
+  "hijri_month": 6,
+  "hijri_year": 1448,
+  "hijri_month_name": "جمادى الآخرة",
+  "day_name": "الثلاثاء",
+  "gregorian_date": "2026-11-17",
+  "gregorian_anchor_date": "2026-11-12",
+  "time_najaf": "09:31:24",
+  "status": "verified",
+  "source": "https://www.sistani.org/",
+  "last_updated": "2026-11-17T09:31:18+03:00"
+}
+```
+
+---
+
 ## Religious Reference
 
 For religiously significant dates, especially the beginning of lunar months, users should verify the date through the official announcements and rulings of the relevant religious authority.
