@@ -8,7 +8,9 @@ and update `hijri.json`.
 import os
 import re
 import json
+import time
 import urllib.request
+import ssl
 from datetime import datetime, timezone, timedelta
 
 MONTH_MAP = {
@@ -56,23 +58,31 @@ def fetch_sistani_html() -> str:
         "https://www.sistani.org/arabic/"
     ]
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         "Accept-Language": "ar,en;q=0.9"
     }
 
-    last_error = None
-    for url in urls:
-        try:
-            req = urllib.request.Request(url, headers=headers)
-            with urllib.request.urlopen(req, timeout=20) as resp:
-                if resp.status == 200:
-                    return resp.read().decode("utf-8", errors="ignore")
-        except Exception as e:
-            last_error = e
-            continue
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
 
-    raise RuntimeError(f"Failed to fetch data from sistani.org: {last_error}")
+    last_error = None
+    for attempt in range(3):
+        for url in urls:
+            try:
+                req = urllib.request.Request(url, headers=headers)
+                with urllib.request.urlopen(req, timeout=25, context=ctx) as resp:
+                    if resp.status == 200:
+                        content = resp.read().decode("utf-8", errors="ignore")
+                        if "home-date" in content:
+                            return content
+            except Exception as e:
+                last_error = e
+                time.sleep(2)
+                continue
+
+    raise RuntimeError(f"Failed to fetch data from sistani.org after retries: {last_error}")
 
 def parse_sistani_data(html: str) -> dict:
     # 1. Match uts timestamp if present
@@ -99,8 +109,8 @@ def parse_sistani_data(html: str) -> dict:
     day_name_match = re.search(r"^(الأحد|الاحد|الإثنين|الاثنين|الثلاثاء|الأربعاء|الاربعاء|الخميس|الجمعة|الجمعه|السبت)", hijri_norm.strip())
     day_name = day_name_match.group(1) if day_name_match else ""
 
-    # Parse Hijri: e.g. "6 - جمادى الآخرة - 1448 هـ"
-    m = re.search(r"(\d{1,2})\s*-\s*([^-]+?)\s*-\s*(\d{4})", hijri_norm)
+    # Parse Hijri: e.g. "6 - جمادى الآخرة - 1448 هـ" or "6 – جمادى الآخرة – 1448"
+    m = re.search(r"(\d{1,2})\s*[-–—]?\s*([^\d\-–—]+?)\s*[-–—]?\s*(\d{4})", hijri_norm)
     if not m:
         raise ValueError(f"Could not extract Hijri day/month/year from: '{hijri_norm}'")
 
